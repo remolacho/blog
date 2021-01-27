@@ -3,24 +3,17 @@ package main
 import (
 	"blog/internal/server"
 	"log"
-	"os"
-	"os/signal"
 )
 
+// se crea desde aca
+// https://dev.to/orlmonteverde/api-rest-con-go-golang-y-postgresql-m0o
 func main() {
-	serv, err := server.New("8000")
-	if err != nil {
-		log.Fatal(err)
-	}
+	serv, err := server.New()
+	if err != nil { log.Fatal(err) }
 
 	// start the server.
 	go serv.Start()
 
-	// Wait for an in interrupt.
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	<-c
-
-	// Attempt a graceful shutdown.
+	// Attempt a graceful shutdown press ctrl c.
 	serv.Close()
 }

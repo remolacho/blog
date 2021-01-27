@@ -3,8 +3,11 @@ package server
 
 import (
 	"github.com/go-chi/chi"
+	_ "github.com/joho/godotenv/autoload"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"time"
 )
 
@@ -14,8 +17,9 @@ type Server struct {
 }
 
 // New inicialize a new server with configuration.
-func New(port string) (*Server, error) {
+func New() (*Server, error) {
 	r := chi.NewRouter()
+	port := os.Getenv("PORT")
 
 	serv := &http.Server{
 		Addr:         ":" + port,
@@ -29,14 +33,17 @@ func New(port string) (*Server, error) {
 	return &server, nil
 }
 
-// Close server resources.
-func (serv *Server) Close() error {
-	// TODO: add resource closure.
-	return nil
-}
-
 // Start the server.
 func (serv *Server) Start() {
 	log.Printf("Server running on http://localhost%s", serv.server.Addr)
 	log.Fatal(serv.server.ListenAndServe())
+}
+
+// Close server resources.
+func (serv *Server) Close() error {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	<-c
+	log.Printf("Server shutdown")
+	return nil
 }
