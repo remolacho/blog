@@ -38,5 +38,7 @@ func (handler *UserHandler) Login(responseWriter http.ResponseWriter, request *h
 		return
 	}
 
+	responseWriter.Header().Set("Authorization", "Bearer "+token)
+
 	response.JSON(responseWriter, http.StatusOK, response.Map{"token": token})
 }

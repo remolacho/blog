@@ -10,5 +10,4 @@ type Repository interface {
 	Create(ctx context.Context, user *User) error
 	Update(ctx context.Context, id uint, user User) error
 	Delete(ctx context.Context, id uint) error
-	logger(query string, params []string)
 }
