@@ -2,9 +2,9 @@ package post
 
 import (
 	"blog/internal/engineDB"
+	"blog/internal/server/logger"
 	"context"
-	"log"
-	"strings"
+	"strconv"
 	"time"
 )
 
@@ -24,7 +24,7 @@ func (pr *PostRepository) All(ctx context.Context) ([]Post, error) {
 	}
 
 	defer rows.Close()
-	defer pr.logger(q, []string{""})
+	defer logger.Sql(q, []string{""})
 
 	var posts []Post
 	for rows.Next() {
@@ -41,6 +41,8 @@ func (pr *PostRepository) Find(ctx context.Context, id uint) (Post, error) {
     SELECT id, body, user_id, created_at, updated_at
         FROM posts WHERE id = $1;
     `
+
+	defer logger.Sql(q, []string{convertToString(id)})
 
 	row := pr.Data.DB.QueryRowContext(ctx, q, id)
 
@@ -59,6 +61,8 @@ func (pr *PostRepository) FindByUser(ctx context.Context, userID uint) ([]Post, 
         FROM posts
         WHERE user_id = $1;
     `
+
+	defer logger.Sql(q, []string{convertToString(userID)})
 
 	rows, err := pr.Data.DB.QueryContext(ctx, q, userID)
 	if err != nil {
@@ -84,6 +88,8 @@ func (pr *PostRepository) Create(ctx context.Context, p *Post) error {
         RETURNING id;
     `
 
+	defer logger.Sql(q, []string{p.Body, convertToString(p.UserID)})
+
 	stmt, err := pr.Data.DB.PrepareContext(ctx, q)
 	if err != nil {
 		return err
@@ -107,6 +113,8 @@ func (pr *PostRepository) Update(ctx context.Context, id uint, p Post) error {
         WHERE id=$3;
     `
 
+	defer logger.Sql(q, []string{p.Body, convertToString(p.UserID), convertToString(id)})
+
 	stmt, err := pr.Data.DB.PrepareContext(ctx, q)
 	if err != nil {
 		return err
@@ -127,6 +135,8 @@ func (pr *PostRepository) Update(ctx context.Context, id uint, p Post) error {
 func (pr *PostRepository) Delete(ctx context.Context, id uint) error {
 	q := `DELETE FROM posts WHERE id=$1;`
 
+	defer logger.Sql(q, []string{convertToString(id)})
+
 	stmt, err := pr.Data.DB.PrepareContext(ctx, q)
 	if err != nil {
 		return err
@@ -142,6 +152,6 @@ func (pr *PostRepository) Delete(ctx context.Context, id uint) error {
 	return nil
 }
 
-func (pr *PostRepository) logger(query string, params []string) {
-	log.Printf("SQL: %s, [%s]", query, strings.Join(params, ","))
+func convertToString(id uint) string {
+	return strconv.FormatUint(uint64(id), 10)
 }

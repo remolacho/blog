@@ -2,9 +2,9 @@ package user
 
 import (
 	"blog/internal/engineDB"
+	"blog/internal/server/logger"
 	"context"
-	"log"
-	"strings"
+	"strconv"
 	"time"
 )
 
@@ -25,6 +25,7 @@ func (ur *UserRepository) All(ctx context.Context) ([]User, error) {
 	}
 
 	defer rows.Close()
+	defer logger.Sql(q, []string{""})
 
 	var users []User
 	for rows.Next() {
@@ -43,6 +44,8 @@ func (ur *UserRepository) Find(ctx context.Context, id uint) (User, error) {
         created_at, updated_at
         FROM users WHERE id = $1;
     `
+
+	defer logger.Sql(q, []string{convertToString(id)})
 
 	row := ur.Data.DB.QueryRowContext(ctx, q, id)
 
@@ -63,7 +66,7 @@ func (ur *UserRepository) FindByUsername(ctx context.Context, username string) (
         FROM users WHERE username = $1;
     `
 
-	defer ur.logger(q, []string{username})
+	defer logger.Sql(q, []string{username})
 
 	row := ur.Data.DB.QueryRowContext(ctx, q, username)
 
@@ -83,6 +86,8 @@ func (ur *UserRepository) Create(ctx context.Context, u *User) error {
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING id;
     `
+
+	defer logger.Sql(q, []string{u.FirstName, u.LastName, u.Username, u.Email, u.Picture})
 
 	if u.Picture == "" {
 		u.Picture = "https://placekitten.com/g/300/300"
@@ -117,6 +122,7 @@ func (ur *UserRepository) Update(ctx context.Context, id uint, u User) error {
 	}
 
 	defer stmt.Close()
+	defer logger.Sql(q, []string{u.FirstName, u.LastName, u.Email, u.Picture, convertToString(id)})
 
 	_, err = stmt.ExecContext(
 		ctx, u.FirstName, u.LastName, u.Email,
@@ -138,6 +144,7 @@ func (ur *UserRepository) Delete(ctx context.Context, id uint) error {
 	}
 
 	defer stmt.Close()
+	defer logger.Sql(q, []string{convertToString(id)})
 
 	_, err = stmt.ExecContext(ctx, id)
 	if err != nil {
@@ -147,6 +154,6 @@ func (ur *UserRepository) Delete(ctx context.Context, id uint) error {
 	return nil
 }
 
-func (ur *UserRepository) logger(query string, params []string) {
-	log.Printf("SQL: %s, [%s]", query, strings.Join(params, ","))
+func convertToString(id uint) string {
+	return strconv.FormatUint(uint64(id), 10)
 }
