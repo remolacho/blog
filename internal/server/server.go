@@ -2,7 +2,9 @@
 package server
 
 import (
+	routes "blog/internal/server/controllers/v1"
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	_ "github.com/joho/godotenv/autoload"
 	"log"
 	"net/http"
@@ -18,12 +20,18 @@ type Server struct {
 
 // New inicialize a new server with configuration.
 func New() (*Server, error) {
-	r := chi.NewRouter()
+	router := chi.NewRouter()
+
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
+
 	port := os.Getenv("PORT")
+
+	router.Mount("/api/v1", routes.New())
 
 	serv := &http.Server{
 		Addr:         ":" + port,
-		Handler:      r,
+		Handler:      router,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
@@ -44,6 +52,6 @@ func (serv *Server) Close() error {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
-	log.Printf("Server shutdown")
+	log.Printf("Server closing on http://localhost%s", serv.server.Addr)
 	return nil
 }
