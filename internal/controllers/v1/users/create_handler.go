@@ -1,7 +1,7 @@
 package users
 
 import (
-	"blog/internal/server/entities/user"
+	"blog/internal/entities/user"
 	"blog/pkg/response"
 	"encoding/json"
 	"fmt"
@@ -18,8 +18,7 @@ func (handler *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	ctx := r.Context()
-	err = handler.Repository.Create(ctx, &u)
+	err = handler.Repository.Create(&u)
 	if err != nil {
 		response.HTTPError(w, http.StatusBadRequest, err.Error())
 		return

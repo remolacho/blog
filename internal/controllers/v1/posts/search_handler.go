@@ -8,9 +8,7 @@ import (
 )
 
 func (handler *PostHandler) All(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	posts, err := handler.Repository.All(ctx)
+	posts, err := handler.Repository.All()
 	if err != nil {
 		response.HTTPError(w, http.StatusNotFound, err.Error())
 		return
@@ -28,8 +26,7 @@ func (handler *PostHandler) Find(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := r.Context()
-	p, err := handler.Repository.Find(ctx, uint(id))
+	p, err := handler.Repository.Find(uint(id))
 	if err != nil {
 		response.HTTPError(w, http.StatusNotFound, err.Error())
 		return
@@ -47,8 +44,7 @@ func (handler *PostHandler) FindByUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := r.Context()
-	posts, err := handler.Repository.FindByUser(ctx, uint(userID))
+	posts, err := handler.Repository.FindByUser(uint(userID))
 	if err != nil {
 		response.HTTPError(w, http.StatusNotFound, err.Error())
 		return

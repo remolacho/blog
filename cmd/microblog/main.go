@@ -1,8 +1,10 @@
 package main
 
 import (
-	"blog/internal/engineDB"
+	"blog/internal/entities/post"
+	"blog/internal/entities/user"
 	"blog/internal/server"
+	"blog/pkg/engineDB"
 	"log"
 )
 
@@ -15,15 +17,16 @@ func main() {
 	}
 
 	// connection to the database.
-	d := engineDB.New()
-	if err := d.DB.Ping(); err != nil {
+	factory := engineDB.Factory()
+	if err := factory.DB.Error; err != nil {
 		log.Fatal(err)
 	}
+
+	factory.DB.AutoMigrate(&user.User{}, &post.Post{})
 
 	// start the server.
 	go serv.Start()
 
 	// Attempt a graceful shutdown press ctrl c.
 	serv.Close()
-	engineDB.Close()
 }

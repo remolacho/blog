@@ -2,7 +2,7 @@
 package server
 
 import (
-	routes "blog/internal/server/controllers/v1"
+	routes "blog/internal/controllers/v1"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	_ "github.com/joho/godotenv/autoload"

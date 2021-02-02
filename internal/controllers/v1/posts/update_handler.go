@@ -1,7 +1,7 @@
 package posts
 
 import (
-	"blog/internal/server/entities/post"
+	"blog/internal/entities/post"
 	"blog/pkg/response"
 	"encoding/json"
 	"github.com/go-chi/chi"
@@ -27,8 +27,7 @@ func (handler *PostHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	ctx := r.Context()
-	err = handler.Repository.Update(ctx, uint(id), p)
+	err = handler.Repository.Update(uint(id), p)
 	if err != nil {
 		response.HTTPError(w, http.StatusNotFound, err.Error())
 		return

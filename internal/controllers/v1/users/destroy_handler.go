@@ -1,4 +1,4 @@
-package posts
+package users
 
 import (
 	"blog/pkg/response"
@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func (handler *PostHandler) Delete(w http.ResponseWriter, r *http.Request) {
+func (handler *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 
 	id, err := strconv.Atoi(idStr)
@@ -16,8 +16,7 @@ func (handler *PostHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := r.Context()
-	err = handler.Repository.Delete(ctx, uint(id))
+	err = handler.Repository.Delete(uint(id))
 	if err != nil {
 		response.HTTPError(w, http.StatusNotFound, err.Error())
 		return

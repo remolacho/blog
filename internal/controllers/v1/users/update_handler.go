@@ -1,7 +1,7 @@
 package users
 
 import (
-	"blog/internal/server/entities/user"
+	"blog/internal/entities/user"
 	"blog/pkg/response"
 	"encoding/json"
 	"github.com/go-chi/chi"
@@ -27,8 +27,7 @@ func (handler *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	ctx := r.Context()
-	err = handler.Repository.Update(ctx, uint(id), u)
+	err = handler.Repository.Update(uint(id), u)
 	if err != nil {
 		response.HTTPError(w, http.StatusNotFound, err.Error())
 		return

@@ -1,7 +1,7 @@
 package posts
 
 import (
-	"blog/internal/server/entities/post"
+	"blog/internal/entities/post"
 	"blog/pkg/response"
 	"encoding/json"
 	"fmt"
@@ -18,8 +18,7 @@ func (handler *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	ctx := r.Context()
-	err = handler.Repository.Create(ctx, &p)
+	err = handler.Repository.Create(&p)
 	if err != nil {
 		response.HTTPError(w, http.StatusBadRequest, err.Error())
 		return

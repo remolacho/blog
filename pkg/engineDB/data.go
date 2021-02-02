@@ -1,7 +1,7 @@
 package engineDB
 
 import (
-	"database/sql"
+	"gorm.io/gorm"
 	"log"
 	"sync"
 )
@@ -13,7 +13,7 @@ var (
 
 // Data manages the connection to the database.
 type Data struct {
-	DB *sql.DB
+	DB *gorm.DB
 }
 
 func initDB() {
@@ -22,22 +22,10 @@ func initDB() {
 		log.Panic(err)
 	}
 
-	err = MakeMigration(db)
-	if err != nil {
-		log.Panic(err)
-	}
-
 	data = &Data{DB: db}
 }
 
-func New() *Data {
+func Factory() *Data {
 	once.Do(initDB)
 	return data
-}
-
-func Close() error {
-	if data == nil {
-		return nil
-	}
-	return data.DB.Close()
 }

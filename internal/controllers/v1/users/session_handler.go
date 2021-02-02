@@ -1,7 +1,7 @@
 package users
 
 import (
-	"blog/internal/server/entities/user"
+	"blog/internal/entities/user"
 	"blog/pkg/claim"
 	"blog/pkg/response"
 	"encoding/json"
@@ -19,8 +19,7 @@ func (handler *UserHandler) Login(responseWriter http.ResponseWriter, request *h
 
 	defer request.Body.Close()
 
-	ctx := request.Context()
-	storedUser, err := handler.Repository.FindByUsername(ctx, user.Username)
+	storedUser, err := handler.Repository.FindByUsername(user.Username)
 	if err != nil {
 		response.HTTPError(responseWriter, http.StatusNotFound, err.Error())
 		return
